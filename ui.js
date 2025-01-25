@@ -1,30 +1,31 @@
 /********************************************************************************
  * ui.js
  *
- * Builds or rebuilds the wardrobe table, handles display of item data,
- * sorting, searching, and integration with temporary wear & tear.
+ * Builds the wardrobe table, displaying:
+ *  - columns for item data,
+ *  - a separate "Temp Wear" column,
+ *  - a separate "Actions" column for usage/wash/temporary-wear toggles.
  ********************************************************************************/
 
 /**
  * Rebuild the main wardrobe table in the DOM.
- * Called after any data changes (wash, use, editing an item, etc.).
  */
 window.updateWardrobeTable = function() {
   const tbody = document.querySelector('#wardrobe-table tbody');
   tbody.innerHTML = '';
 
   window.wardrobeItems.forEach((item) => {
-    // 1) Calculate condition (0..100%)
+    // 1) Calculate item condition (0..100%)
     const condPercent = window.calculateCondition(item);
 
-    // 2) Usage/wash stats
+    // 2) Basic usage/wash stats
     const usageCount = item.usageHistory.length;
     const lastUse = usageCount > 0 ? item.usageHistory[usageCount - 1] : 'Never';
 
     const washCount = item.washHistory.length;
     const lastWash = washCount > 0 ? item.washHistory[washCount - 1] : 'Never';
 
-    // 3) Temporary Wear description
+    // 3) Temporary Wear
     const tempWear = item.wearAndTear || {
       wrinkles: false,
       odors: false,
@@ -39,7 +40,7 @@ window.updateWardrobeTable = function() {
     if (tempWear.elasticityLoss)         tempWearDesc.push("Elasticity Loss");
     if (tempWear.surfaceDirt.level > 0)  tempWearDesc.push(`Dirt (L${tempWear.surfaceDirt.level})`);
 
-    // 4) Create row for this item
+    // 4) Create a table row
     const row = document.createElement('tr');
     row.innerHTML = `
       <td class="image-cell">
@@ -59,36 +60,34 @@ window.updateWardrobeTable = function() {
       <td>${condPercent}%</td>
       <td>${tempWearDesc.join(", ") || "None"}</td>
       <td>
-        <!-- Basic action buttons for usage/wash -->
+        <!-- All the ACTION BUTTONS in a separate column -->
         <button class="action-btn usage-btn" onclick="addUsage(${item.id})">Use</button>
         <button class="action-btn wash-btn" onclick="addWash(${item.id})">Wash</button>
-
-        <!-- Access usage/wash history in separate sections -->
         <button class="action-btn history-btn" onclick="viewUsageHistory(${item.id})">Usage Hist</button>
         <button class="action-btn history-btn" onclick="viewWashHistory(${item.id})">Wash Hist</button>
 
-        <!-- Example: add wrinkles / odor / stain L2 to demonstrate temporary wear -->
+        <!-- Example buttons for temporary wear -->
         <button onclick="addTemporaryWear(${item.id}, 'wrinkles', true)">Wrinkle+</button>
         <button onclick="addTemporaryWear(${item.id}, 'odors', true)">Odor+</button>
         <button onclick="addTemporaryWear(${item.id}, 'stains', { level:2 })">Stain L2</button>
-        <button onclick="resetTemporaryWear(${item.id})">Resolve All</button>
-
+        <button onclick="resetTemporaryWear(${item.id})">Resolve Wear</button>
+        
         <!-- Edit/Delete item -->
         <button class="action-btn edit-btn" onclick="editItem(${item.id})">Edit</button>
         <button class="action-btn delete-btn" onclick="deleteItem(${item.id})">Delete</button>
       </td>
     `;
 
-    // Add row to table body
+    // Add row to table
     tbody.appendChild(row);
   });
 
-  // Optionally check for wash reminders
+  // Optionally check wash reminders
   checkWashReminders();
 };
 
 /**
- * Check if any item hasn't been washed for over 30 days and log a reminder.
+ * Logs a reminder if an item wasn't washed for 30+ days.
  */
 function checkWashReminders() {
   const today = new Date();
@@ -105,8 +104,8 @@ function checkWashReminders() {
 }
 
 /**
- * Event listener for adding a new fabric row on the form.
- * This matches the short list of fabrics from fabric.js
+ * "Add Fabric" event listener for the form:
+ * Creates a new row of fabric inputs (short list, no duplicates).
  */
 document.getElementById('add-fabric-btn').addEventListener('click', function() {
   const fabricInputs = document.getElementById('fabric-inputs');
@@ -133,16 +132,14 @@ document.getElementById('add-fabric-btn').addEventListener('click', function() {
   fabricInputs.appendChild(newField);
 });
 
-/** Called by "Remove" button in the new fabric row. */
+/** Removes a fabric input row. */
 window.removeFabricField = function(button) {
   button.parentElement.remove();
 };
 
-// =============================
-// Sorting & Searching
-// =============================
-
-/** Sort by name/washes/usage when user clicks the respective button. */
+/**
+ * Sorting logic by name/washes/usage
+ */
 document.getElementById('sort-name-btn').addEventListener('click', () => sortItems('name'));
 document.getElementById('sort-wash-btn').addEventListener('click', () => sortItems('washHistory'));
 document.getElementById('sort-usage-btn').addEventListener('click', () => sortItems('usageHistory'));
@@ -159,36 +156,34 @@ function sortItems(field) {
   window.updateWardrobeTable();
 }
 
-/** Filter items by name in real time. */
+/**
+ * Searching logic (filter items by name).
+ */
 document.getElementById('search-bar').addEventListener('keyup', filterTable);
-
 function filterTable() {
   const query = document.getElementById('search-bar').value.toLowerCase();
   const rows = document.querySelectorAll('#wardrobe-table tbody tr');
   rows.forEach(row => {
-    const itemName = row.cells[1].textContent.toLowerCase(); // name is col index 1
+    const itemName = row.cells[1].textContent.toLowerCase(); // name in col index 1
     row.style.display = itemName.includes(query) ? '' : 'none';
   });
 }
 
-// =============================
-// Editing & Deleting Items
-// =============================
-
-/** When editing an item, pre-fill the form with its data. */
+/**
+ * Edit item: pre-fill form fields, rebuild fabric list, etc.
+ */
 window.editItem = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
 
   window.editingItemId = item.id;
 
-  // Pre-fill the form fields
   document.getElementById('item-name').value = item.name;
   document.getElementById('category').value = item.category;
   document.getElementById('purchase-date').value = item.purchaseDate;
-  document.getElementById('image-input').value = ''; // reset
+  document.getElementById('image-input').value = '';
 
-  // Rebuild the fabric inputs
+  // Rebuild fabric inputs
   const fabricArea = document.getElementById('fabric-inputs');
   fabricArea.innerHTML = '';
   if (Array.isArray(item.fabrics)) {
@@ -225,7 +220,9 @@ window.editItem = function(id) {
   document.getElementById('submit-button').textContent = 'Save Changes';
 };
 
-/** Delete an item from the global array. */
+/**
+ * Delete item from array and refresh table.
+ */
 window.deleteItem = function(id) {
   const idx = window.wardrobeItems.findIndex(i => i.id === id);
   if (idx !== -1) {
