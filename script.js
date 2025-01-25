@@ -1,17 +1,23 @@
-import { loadWardrobeItemsFromStorage } from './data.js';
-import { setupEventListeners, updateWardrobeTable } from './ui.js';
-import { wardrobeItems, saveWardrobeItemsToStorage } from './data.js';
+/**
+ * script.js
+ * 
+ * This final file wires everything together. Because we are using normal <script> tags,
+ * there's no "import" statements. We rely on the global functions
+ * (e.g., window.updateWardrobeTable, window.wardrobeItems, etc.)
+ */
 
-// We'll store the ID of an item being edited here:
-window.editingItemId = null;
+// On page load, do the following:
+window.addEventListener('load', () => {
+  // Load from localStorage
+  window.loadWardrobeItemsFromStorage();
+  // Build the table
+  window.updateWardrobeTable();
+});
 
-// ==============
-// Form Handling
-// ==============
+// Handle form submission: add or edit an item
 document.getElementById('wardrobe-form').addEventListener('submit', async function(e) {
   e.preventDefault();
 
-  // Basic fields
   const itemName = document.getElementById('item-name').value.trim();
   const category = document.getElementById('category').value;
   const purchaseDate = document.getElementById('purchase-date').value;
@@ -20,43 +26,43 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
   const fabricGroups = document.querySelectorAll('.fabric-group');
   const fabrics = [];
   fabricGroups.forEach(group => {
-    const fabricType = group.querySelector('.fabric-type').value;
-    const fabricPerc = parseInt(group.querySelector('.fabric-percentage').value, 10);
-    fabrics.push({ type: fabricType, percentage: fabricPerc });
+    const type = group.querySelector('.fabric-type').value;
+    const perc = parseInt(group.querySelector('.fabric-percentage').value, 10);
+    fabrics.push({ type, percentage: perc });
   });
   // Check total = 100
-  const totalPercent = fabrics.reduce((sum, f) => sum + f.percentage, 0);
-  if (totalPercent !== 100) {
+  const totalPerc = fabrics.reduce((sum, f) => sum + f.percentage, 0);
+  if (totalPerc !== 100) {
     alert("Fabrics must total 100%!");
     return;
   }
 
-  // Handle image
+  // Handle image upload
   const imageInput = document.getElementById('image-input');
   let imageData = '';
   if (imageInput.files && imageInput.files[0]) {
     imageData = await readFileAsBase64(imageInput.files[0]);
   }
 
+  // Determine if editing or adding
   if (window.editingItemId) {
-    // ========== EDIT EXISTING ITEM ==========
-    const idx = wardrobeItems.findIndex(i => i.id === window.editingItemId);
+    // Edit existing
+    const idx = window.wardrobeItems.findIndex(i => i.id === window.editingItemId);
     if (idx > -1) {
-      wardrobeItems[idx].name = itemName;
-      wardrobeItems[idx].category = category;
-      wardrobeItems[idx].purchaseDate = purchaseDate;
-      wardrobeItems[idx].fabrics = fabrics;
+      window.wardrobeItems[idx].name = itemName;
+      window.wardrobeItems[idx].category = category;
+      window.wardrobeItems[idx].purchaseDate = purchaseDate;
+      window.wardrobeItems[idx].fabrics = fabrics;
       if (imageData) {
-        // Only update image if user selected a new file
-        wardrobeItems[idx].image = imageData;
+        window.wardrobeItems[idx].image = imageData;
       }
     }
     window.editingItemId = null;
-
     document.getElementById('form-title').textContent = 'Add a Wardrobe Item';
     document.getElementById('submit-button').textContent = 'Add Item';
+
   } else {
-    // ========== ADD NEW ITEM ==========
+    // Add new
     const newItem = {
       id: Date.now(),
       name: itemName,
@@ -67,16 +73,17 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
       usageHistory: [],
       washHistory: [],
     };
-    wardrobeItems.push(newItem);
+    window.wardrobeItems.push(newItem);
   }
 
-  saveWardrobeItemsToStorage();
-  updateWardrobeTable();
+  window.saveWardrobeItemsToStorage();
+  window.updateWardrobeTable();
 
-  // Reset
+  // Reset form
   this.reset();
 });
 
+/** Helper: read file as base64 */
 async function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -85,12 +92,3 @@ async function readFileAsBase64(file) {
     reader.readAsDataURL(file);
   });
 }
-
-// ==================
-// Initialization
-// ==================
-window.addEventListener('load', () => {
-  loadWardrobeItemsFromStorage();
-  updateWardrobeTable();
-  setupEventListeners();
-});
