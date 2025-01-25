@@ -16,13 +16,12 @@
     <section class="section">
       <h2 id="form-title">Add a Wardrobe Item</h2>
       <form id="wardrobe-form">
-        <!-- Basic info -->
         <label for="item-name">Item Name:</label>
         <input type="text" id="item-name" required />
 
         <label for="category">Category:</label>
         <select id="category">
-          <!-- Dividing 'Underwear' into Bra and Panties, plus other categories -->
+          <!-- Dividing old 'Underwear' into Bra & Panties -->
           <option value="Bra">Bra</option>
           <option value="Panties">Panties</option>
           <option value="T-shirt">T-shirt</option>
@@ -48,43 +47,42 @@
         <label for="purchase-date">Purchase Date:</label>
         <input type="date" id="purchase-date" required />
 
-        <!-- Multi-fabric input area -->
+        <!-- Multiple fabrics must total 100% -->
         <label>Fabrics (must total 100%):</label>
         <div id="fabric-inputs">
           <div class="fabric-group">
             <select class="fabric-type">
-				<option value="Cotton">Cotton</option>
-				<option value="Polyester">Polyester</option>
-				<option value="Wool">Wool</option>
-				<option value="Leather">Leather</option>
-				<option value="Silk">Silk</option>
-				<option value="Nylon">Nylon</option>
-				<option value="Linen">Linen</option>
-				<option value="Acrylic">Acrylic</option>
-				<option value="Spandex">Spandex</option>
-				<option value="Cashmere">Cashmere</option>
-				<option value="Bamboo">Bamboo</option>
-				<option value="Denim">Denim</option>
-				<option value="Rayon">Rayon</option>
-				<option value="Viscose">Viscose</option>
-				<option value="Modal">Modal</option>
-				<option value="Organza">Organza</option>
-				<option value="Velvet">Velvet</option>
-				<option value="Satin">Satin</option>
-				<option value="Lyocell">Lyocell</option>
-				<option value="Chiffon">Chiffon</option>
-				<option value="Latex">Latex</option>
+              <option value="Cotton">Cotton</option>
+              <option value="Polyester">Polyester</option>
+              <option value="Wool">Wool</option>
+              <option value="Leather">Leather</option>
+              <option value="Silk">Silk</option>
+              <option value="Nylon">Nylon</option>
+              <option value="Linen">Linen</option>
+              <option value="Acrylic">Acrylic</option>
+              <option value="Spandex">Spandex</option>
+              <option value="Cashmere">Cashmere</option>
+              <option value="Bamboo">Bamboo</option>
+              <option value="Denim">Denim</option>
+              <option value="Rayon">Rayon</option>
+              <option value="Viscose">Viscose</option>
+              <option value="Modal">Modal</option>
+              <option value="Organza">Organza</option>
+              <option value="Velvet">Velvet</option>
+              <option value="Satin">Satin</option>
+              <option value="Lyocell">Lyocell</option>
+              <option value="Chiffon">Chiffon</option>
+              <option value="Latex">Latex</option>
             </select>
             <input type="number" class="fabric-percentage" placeholder="%" min="1" max="100" required />
           </div>
         </div>
         <button type="button" id="add-fabric-btn">+ Add Fabric</button>
 
-        <!-- Optional image upload -->
+        <!-- Optional Image Upload -->
         <label for="image-input">Upload Image (Optional):</label>
         <input type="file" id="image-input" accept="image/*" />
 
-        <!-- Button changes from "Add Item" to "Save Changes" when editing -->
         <button type="submit" id="submit-button">Add Item</button>
       </form>
     </section>
@@ -92,11 +90,7 @@
     <!-- ====== TABLE ACTIONS (SEARCH, SORT, EXPORT/IMPORT) ====== -->
     <section class="section">
       <div class="actions-bar">
-        <input
-          type="text"
-          id="search-bar"
-          placeholder="Search items..."
-        />
+        <input type="text" id="search-bar" placeholder="Search items..." />
         <button class="action-btn sort-btn" id="sort-name-btn">Sort by Name</button>
         <button class="action-btn sort-btn" id="sort-wash-btn">Sort by Washes</button>
         <button class="action-btn sort-btn" id="sort-usage-btn">Sort by Usage</button>
@@ -124,7 +118,7 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody><!-- Populated by JS --></tbody>
+        <tbody><!-- populated by JS --></tbody>
       </table>
     </section>
 
@@ -143,7 +137,12 @@
     </section>
   </main>
 
-  <!-- Main script as a module -->
-  <script type="module" src="script.js"></script>
+  <!-- Load scripts in a specific order (all plain scripts, not type="module") -->
+  <script src="data.js"></script>
+  <script src="fabric.js"></script>
+  <script src="condition.js"></script>
+  <script src="history.js"></script>
+  <script src="ui.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
