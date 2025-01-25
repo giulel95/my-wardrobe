@@ -1,16 +1,12 @@
-export let wardrobeItems = [];
+window.wardrobeItems = []; // Global array attached to window for simplicity
 
-/**
- * Load items from local storage.
- * If old data lacks 'fabrics', 'usageHistory', or 'washHistory',
- * we add them to keep code consistent.
- */
-export function loadWardrobeItemsFromStorage() {
+// Load from local storage, migrate old data if needed
+window.loadWardrobeItemsFromStorage = function() {
   const data = localStorage.getItem('wardrobeItems');
   if (data) {
-    wardrobeItems = JSON.parse(data);
-    // Migrate old data
-    wardrobeItems.forEach((item) => {
+    window.wardrobeItems = JSON.parse(data);
+    window.wardrobeItems.forEach((item) => {
+      // Migrate old data
       if (!item.fabrics) {
         item.fabrics = [{ type: 'Cotton', percentage: 100 }];
       }
@@ -22,16 +18,16 @@ export function loadWardrobeItemsFromStorage() {
       }
     });
   }
-}
+};
 
-/** Save items to local storage. */
-export function saveWardrobeItemsToStorage() {
-  localStorage.setItem('wardrobeItems', JSON.stringify(wardrobeItems));
-}
+// Save to local storage
+window.saveWardrobeItemsToStorage = function() {
+  localStorage.setItem('wardrobeItems', JSON.stringify(window.wardrobeItems));
+};
 
-/** Export data as JSON file. */
-export function exportData() {
-  const dataStr = JSON.stringify(wardrobeItems, null, 2);
+// Export data as JSON
+window.exportData = function() {
+  const dataStr = JSON.stringify(window.wardrobeItems, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
@@ -39,10 +35,10 @@ export function exportData() {
   a.href = url;
   a.download = 'wardrobe-data.json';
   a.click();
-}
+};
 
-/** Import data from selected JSON file. */
-export function importData(event) {
+// Import from JSON file
+window.importData = function(event) {
   const file = event.target.files[0];
   if (!file) return;
 
@@ -51,8 +47,9 @@ export function importData(event) {
     try {
       const importedData = JSON.parse(e.target.result);
       if (Array.isArray(importedData)) {
-        wardrobeItems = importedData;
-        saveWardrobeItemsToStorage();
+        window.wardrobeItems = importedData;
+        window.saveWardrobeItemsToStorage();
+        window.updateWardrobeTable(); // Refresh UI
       } else {
         alert("Invalid file format.");
       }
@@ -61,4 +58,7 @@ export function importData(event) {
     }
   };
   reader.readAsText(file);
-}
+};
+
+// We'll store ID of item being edited here
+window.editingItemId = null;
