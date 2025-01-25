@@ -1,205 +1,120 @@
-/* ====== BASIC STYLES ====== */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f9;
-}
-
-header {
-  background-color: #4a90e2;
-  color: white;
-  text-align: center;
-  padding: 1rem 0;
-  margin-bottom: 1rem;
-}
-
-main {
-  padding: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-h1, h2 {
-  margin: 0.5rem 0;
-}
-
-.section {
-  background: white;
-  padding: 1rem;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-}
-
-/* ====== FORM STYLES ====== */
-form label {
-  display: block;
-  margin: 0.5rem 0 0.2rem;
-}
-
-form input, form select {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.fabric-group {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.fabric-group select,
-.fabric-group input {
-  width: auto;
-  flex: 1;
-}
-
-form button {
-  display: inline-block;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-form button:hover {
-  background-color: #357ab8;
-}
-
-/* ====== TABLE STYLES ====== */
+/* General Table Styling */
 table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-table th, table td {
-  border: 1px solid #ddd;
-  padding: 0.8rem;
+  margin: 20px 0;
+  font-size: 16px;
   text-align: left;
-  vertical-align: middle;
 }
 
-table th {
-  background-color: #4a90e2;
-  color: white;
+th, td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
 }
 
-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+th {
+  background-color: #f4f4f4;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-table tbody tr:hover {
-  background-color: #f1f1f1;
+td {
+  vertical-align: top;
+  word-wrap: break-word;
+  max-width: 250px; /* Prevent overflow for long text */
 }
 
-/* ====== ACTION BUTTONS ====== */
-.action-btn {
-  padding: 0.4rem 0.8rem;
-  margin: 0 0.2rem;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 0.85rem;
+/* Temporary Wear Column */
+td:nth-child(10), th:nth-child(10) {
+  width: 200px; /* Adjust width for Temp Wear column */
+  font-size: 14px;
+  color: #555;
 }
 
-.sort-btn {
-  background-color: #5c7df2;
-  color: white;
+/* Actions Column */
+td:nth-child(11), th:nth-child(11) {
+  width: 300px; /* Adjust width for Actions column */
+  text-align: center;
 }
 
-.usage-btn {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.wash-btn {
-  background-color: #28a745;
-  color: white;
-}
-
-.history-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.edit-btn {
-  background-color: #ffc107;
-  color: white;
-}
-
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-/* ====== IMAGE STYLES ====== */
-.item-image {
+/* Image Cell */
+.image-cell img {
   width: 50px;
   height: 50px;
   object-fit: cover;
   border-radius: 3px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
 }
 
-.image-cell {
-  width: 60px;
-  text-align: center;
-}
-
-/* ====== WASH & USAGE HISTORY SECTIONS ====== */
-.history-section {
-  background: white;
-  padding: 1rem;
-  margin-top: 1rem;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  display: none; /* hidden by default */
-}
-
-.history-details ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.history-details li {
-  padding: 0.3rem 0;
-  border-bottom: 1px solid #ccc;
-}
-
-.history-details li:last-child {
-  border-bottom: none;
-}
-
-.history-details button {
-  margin-left: 0.3rem;
-  font-size: 0.7rem;
-  padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-}
-
-/* ====== ACTIONS BAR ====== */
-.actions-bar {
+.image-cell div {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
   align-items: center;
-  margin-bottom: 0.5rem;
+  justify-content: center;
 }
 
-.actions-bar input[type="text"] {
-  flex: 1;
-  max-width: 300px;
+/* Buttons */
+button {
+  padding: 5px 10px;
+  margin: 2px;
+  font-size: 14px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
-#export-btn, #import-file {
-  margin-left: 0.5rem;
+button.action-btn {
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+button.action-btn:hover {
+  background-color: #0056b3;
+}
+
+button.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+button.delete-btn:hover {
+  background-color: #a71d2a;
+}
+
+button.edit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+button.edit-btn:hover {
+  background-color: #1d7c2f;
+}
+
+button.wash-btn, button.usage-btn, button.history-btn {
+  background-color: #ffc107;
+  color: #333;
+}
+
+button.wash-btn:hover, button.usage-btn:hover, button.history-btn:hover {
+  background-color: #e0a800;
+}
+
+/* Wrapping for Temporary Wear Descriptions */
+td:nth-child(10) {
+  white-space: normal; /* Allow wrapping for long text */
+  line-height: 1.5;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  table {
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px;
+  }
+  td:nth-child(10), td:nth-child(11) {
+    width: auto; /* Allow dynamic resizing for narrow screens */
+  }
 }
