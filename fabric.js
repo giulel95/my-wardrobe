@@ -1,7 +1,8 @@
-// Category durability remains the same as before, with Bra and Panties:
-export const categoryDurability = {
+// Category durability
+window.categoryDurability = {
   "Bra":        { maxUses: 60,  maxWashes: 40,  maxYears: 1.5 },
   "Panties":    { maxUses: 50,  maxWashes: 30,  maxYears: 1   },
+
   "T-shirt":    { maxUses: 100, maxWashes: 50,  maxYears: 2   },
   "Shirt":      { maxUses: 120, maxWashes: 60,  maxYears: 3   },
   "Jeans":      { maxUses: 200, maxWashes: 100, maxYears: 5   },
@@ -22,8 +23,8 @@ export const categoryDurability = {
   "Other":      { maxUses: 100, maxWashes: 50,  maxYears: 2   },
 };
 
-// Updated "fabricDurability" with more fabrics:
-export const fabricDurability = {
+// Fabric durability multipliers
+window.fabricDurability = {
   "Cotton":    { durabilityMultiplier: 1.0 },
   "Polyester": { durabilityMultiplier: 1.2 },
   "Wool":      { durabilityMultiplier: 0.8 },
