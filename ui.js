@@ -1,19 +1,13 @@
-import { wardrobeItems, saveWardrobeItemsToStorage, exportData, importData } from './data.js';
-import { calculateCondition } from './condition.js';
-import { addUsage, viewUsageHistory, addWash, viewWashHistory } from './history.js';
-import { updateWardrobeTable as reRender } from './ui.js'; // circular reference fix if needed (see note)
-import { updateWardrobeTable } from './ui.js'; // We'll define below
-
 /**
- * Build or rebuild the wardrobe table in the DOM.
+ * The main function to rebuild the wardrobe table in the DOM.
+ * Called after any data changes.
  */
-export function updateWardrobeTable() {
+window.updateWardrobeTable = function() {
   const tbody = document.querySelector('#wardrobe-table tbody');
   tbody.innerHTML = '';
 
-  wardrobeItems.forEach((item) => {
-    // Condition in percent
-    const condPercent = calculateCondition(item);
+  window.wardrobeItems.forEach((item) => {
+    const condPercent = window.calculateCondition(item);
 
     const usageCount = item.usageHistory.length;
     const lastUse = usageCount > 0 ? item.usageHistory[usageCount - 1] : 'Never';
@@ -21,8 +15,8 @@ export function updateWardrobeTable() {
     const washCount = item.washHistory.length;
     const lastWash = washCount > 0 ? item.washHistory[washCount - 1] : 'Never';
 
-    // Build a row
     const row = document.createElement('tr');
+
     row.innerHTML = `
       <td class="image-cell">
         ${
@@ -48,65 +42,30 @@ export function updateWardrobeTable() {
         <button class="action-btn delete-btn" onclick="deleteItem(${item.id})">Delete</button>
       </td>
     `;
+
     tbody.appendChild(row);
   });
 
-  checkWashReminders(); // optional
-}
+  // Optional: check for items needing wash reminders
+  checkWashReminders();
+};
 
-/**
- * Setup all event listeners for sorting, searching, etc.
- */
-export function setupEventListeners() {
-  // Sort buttons
-  document.getElementById('sort-name-btn').addEventListener('click', () => sortItems('name'));
-  document.getElementById('sort-wash-btn').addEventListener('click', () => sortItems('washHistory'));
-  document.getElementById('sort-usage-btn').addEventListener('click', () => sortItems('usageHistory'));
-
-  // Export / Import
-  document.getElementById('export-btn').addEventListener('click', exportData);
-  document.getElementById('import-file').addEventListener('change', importData);
-
-  // Search
-  document.getElementById('search-bar').addEventListener('keyup', filterTable);
-
-  // Add Fabric
-  document.getElementById('add-fabric-btn').addEventListener('click', addFabricField);
-
-  // Form submission handled in another module, or here if you prefer
-}
-
-/**
- * Sorting logic
- */
-function sortItems(field) {
-  if (field === 'name') {
-    wardrobeItems.sort((a, b) => a.name.localeCompare(b.name));
-  } else if (field === 'washHistory') {
-    wardrobeItems.sort((a, b) => b.washHistory.length - a.washHistory.length);
-  } else if (field === 'usageHistory') {
-    wardrobeItems.sort((a, b) => b.usageHistory.length - a.usageHistory.length);
-  }
-  saveWardrobeItemsToStorage();
-  updateWardrobeTable();
-}
-
-/**
- * Filter the table by item name
- */
-function filterTable() {
-  const query = document.getElementById('search-bar').value.toLowerCase();
-  const rows = document.querySelectorAll('#wardrobe-table tbody tr');
-  rows.forEach(row => {
-    const itemName = row.cells[1].textContent.toLowerCase(); // Name in col index 1
-    row.style.display = itemName.includes(query) ? '' : 'none';
+/** Checks if last wash is >30 days old, logs a reminder. */
+function checkWashReminders() {
+  const today = new Date();
+  window.wardrobeItems.forEach((item) => {
+    if (item.washHistory.length > 0) {
+      const lastWashDate = new Date(item.washHistory[item.washHistory.length - 1]);
+      const diffDays = Math.floor((today - lastWashDate) / (1000 * 60 * 60 * 24));
+      if (diffDays > 30) {
+        console.log(`Reminder: ${item.name} was last washed ${diffDays} days ago!`);
+      }
+    }
   });
 }
 
-/**
- * Fabric Field Management (Add extra rows for multi-fabric)
- */
-export function addFabricField() {
+/** Add a new fabric input row. */
+document.getElementById('add-fabric-btn').addEventListener('click', function() {
   const fabricInputs = document.getElementById('fabric-inputs');
   const newField = document.createElement('div');
   newField.className = 'fabric-group';
@@ -122,44 +81,65 @@ export function addFabricField() {
       <option value="Acrylic">Acrylic</option>
       <option value="Spandex">Spandex</option>
       <option value="Cashmere">Cashmere</option>
+      <option value="Bamboo">Bamboo</option>
+      <option value="Denim">Denim</option>
+      <option value="Rayon">Rayon</option>
+      <option value="Viscose">Viscose</option>
+      <option value="Modal">Modal</option>
+      <option value="Organza">Organza</option>
+      <option value="Velvet">Velvet</option>
+      <option value="Satin">Satin</option>
+      <option value="Lyocell">Lyocell</option>
+      <option value="Chiffon">Chiffon</option>
+      <option value="Latex">Latex</option>
     </select>
     <input type="number" class="fabric-percentage" placeholder="%" min="1" max="100" required />
     <button type="button" onclick="removeFabricField(this)">Remove</button>
   `;
   fabricInputs.appendChild(newField);
-}
+});
 
-/** Called by "Remove" button in the new fabric field. */
+/** Remove a single fabric row. */
 window.removeFabricField = function(button) {
   button.parentElement.remove();
 };
 
-/**
- * Wash Reminders if last wash is >30 days
- */
-function checkWashReminders() {
-  const today = new Date();
-  wardrobeItems.forEach(item => {
-    if (item.washHistory.length > 0) {
-      const lastWashDate = new Date(item.washHistory[item.washHistory.length - 1]);
-      const diffTime = today - lastWashDate;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays > 30) {
-        console.log(`Reminder: ${item.name} was last washed ${diffDays} days ago!`);
-      }
-    }
+/** Sort & Search logic below **/
+
+// Sort by name/washes/usage
+document.getElementById('sort-name-btn').addEventListener('click', () => sortItems('name'));
+document.getElementById('sort-wash-btn').addEventListener('click', () => sortItems('washHistory'));
+document.getElementById('sort-usage-btn').addEventListener('click', () => sortItems('usageHistory'));
+
+function sortItems(field) {
+  if (field === 'name') {
+    window.wardrobeItems.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (field === 'washHistory') {
+    window.wardrobeItems.sort((a, b) => b.washHistory.length - a.washHistory.length);
+  } else if (field === 'usageHistory') {
+    window.wardrobeItems.sort((a, b) => b.usageHistory.length - a.usageHistory.length);
+  }
+  window.saveWardrobeItemsToStorage();
+  window.updateWardrobeTable();
+}
+
+// Search functionality
+document.getElementById('search-bar').addEventListener('keyup', filterTable);
+function filterTable() {
+  const query = document.getElementById('search-bar').value.toLowerCase();
+  const rows = document.querySelectorAll('#wardrobe-table tbody tr');
+  rows.forEach(row => {
+    const itemName = row.cells[1].textContent.toLowerCase(); // name in col index 1
+    row.style.display = itemName.includes(query) ? '' : 'none';
   });
 }
 
-// ================
-// Editing & Deleting Items
-// ================
+/** Editing & Deleting Items **/
+
 window.editItem = function(id) {
-  // Find the item
-  const item = wardrobeItems.find(i => i.id === id);
+  const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
 
-  // Mark the item ID as editing
   window.editingItemId = item.id;
 
   // Pre-fill form
@@ -168,13 +148,13 @@ window.editItem = function(id) {
   document.getElementById('purchase-date').value = item.purchaseDate;
   document.getElementById('image-input').value = '';
 
-  // Rebuild fabric inputs from item.fabrics
+  // Rebuild the fabric inputs
   const fabricArea = document.getElementById('fabric-inputs');
   fabricArea.innerHTML = '';
   item.fabrics.forEach(f => {
-    const newField = document.createElement('div');
-    newField.className = 'fabric-group';
-    newField.innerHTML = `
+    const field = document.createElement('div');
+    field.className = 'fabric-group';
+    field.innerHTML = `
       <select class="fabric-type">
         <option value="Cotton">Cotton</option>
         <option value="Polyester">Polyester</option>
@@ -186,28 +166,36 @@ window.editItem = function(id) {
         <option value="Acrylic">Acrylic</option>
         <option value="Spandex">Spandex</option>
         <option value="Cashmere">Cashmere</option>
+        <option value="Bamboo">Bamboo</option>
+        <option value="Denim">Denim</option>
+        <option value="Rayon">Rayon</option>
+        <option value="Viscose">Viscose</option>
+        <option value="Modal">Modal</option>
+        <option value="Organza">Organza</option>
+        <option value="Velvet">Velvet</option>
+        <option value="Satin">Satin</option>
+        <option value="Lyocell">Lyocell</option>
+        <option value="Chiffon">Chiffon</option>
+        <option value="Latex">Latex</option>
       </select>
       <input type="number" class="fabric-percentage" placeholder="%" min="1" max="100" required />
       <button type="button" onclick="removeFabricField(this)">Remove</button>
     `;
-    fabricArea.appendChild(newField);
-    // Populate
-    const typeSelect = newField.querySelector('.fabric-type');
-    const percInput  = newField.querySelector('.fabric-percentage');
-    typeSelect.value = f.type;
-    percInput.value  = f.percentage;
+    fabricArea.appendChild(field);
+    // Set the actual values
+    field.querySelector('.fabric-type').value = f.type;
+    field.querySelector('.fabric-percentage').value = f.percentage;
   });
 
-  // Change button & form title
   document.getElementById('form-title').textContent = 'Edit Wardrobe Item';
   document.getElementById('submit-button').textContent = 'Save Changes';
 };
 
 window.deleteItem = function(id) {
-  const index = wardrobeItems.findIndex(i => i.id === id);
-  if (index !== -1) {
-    wardrobeItems.splice(index, 1);
-    saveWardrobeItemsToStorage();
-    updateWardrobeTable();
+  const idx = window.wardrobeItems.findIndex(i => i.id === id);
+  if (idx !== -1) {
+    window.wardrobeItems.splice(idx, 1);
+    window.saveWardrobeItemsToStorage();
+    window.updateWardrobeTable();
   }
 };
