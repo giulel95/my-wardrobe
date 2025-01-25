@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Wardrobe Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Wardrobe Tracker</h1>
+  </header>
+
+  <main>
+    <!-- ====== ADD/EDIT ITEM FORM ====== -->
+    <section class="section">
+      <h2 id="form-title">Add a Wardrobe Item</h2>
+      <form id="wardrobe-form">
+        <!-- Basic info -->
+        <label for="item-name">Item Name:</label>
+        <input type="text" id="item-name" required />
+
+        <label for="category">Category:</label>
+        <select id="category">
+          <!-- Dividing 'Underwear' into Bra and Panties, plus other categories -->
+          <option value="Bra">Bra</option>
+          <option value="Panties">Panties</option>
+          <option value="T-shirt">T-shirt</option>
+          <option value="Shirt">Shirt</option>
+          <option value="Jeans">Jeans</option>
+          <option value="Pants">Pants</option>
+          <option value="Shorts">Shorts</option>
+          <option value="Skirt">Skirt</option>
+          <option value="Dress">Dress</option>
+          <option value="Sweater">Sweater</option>
+          <option value="Hoodie">Hoodie</option>
+          <option value="Jacket">Jacket</option>
+          <option value="Coat">Coat</option>
+          <option value="Socks">Socks</option>
+          <option value="Shoes">Shoes</option>
+          <option value="Hat">Hat</option>
+          <option value="Casual">Casual</option>
+          <option value="Formal">Formal</option>
+          <option value="Athletic">Athletic</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="purchase-date">Purchase Date:</label>
+        <input type="date" id="purchase-date" required />
+
+        <!-- Multi-fabric input area -->
+        <label>Fabrics (must total 100%):</label>
+        <div id="fabric-inputs">
+          <div class="fabric-group">
+            <select class="fabric-type">
+				<option value="Cotton">Cotton</option>
+				<option value="Polyester">Polyester</option>
+				<option value="Wool">Wool</option>
+				<option value="Leather">Leather</option>
+				<option value="Silk">Silk</option>
+				<option value="Nylon">Nylon</option>
+				<option value="Linen">Linen</option>
+				<option value="Acrylic">Acrylic</option>
+				<option value="Spandex">Spandex</option>
+				<option value="Cashmere">Cashmere</option>
+				<option value="Bamboo">Bamboo</option>
+				<option value="Denim">Denim</option>
+				<option value="Rayon">Rayon</option>
+				<option value="Viscose">Viscose</option>
+				<option value="Modal">Modal</option>
+				<option value="Organza">Organza</option>
+				<option value="Velvet">Velvet</option>
+				<option value="Satin">Satin</option>
+				<option value="Lyocell">Lyocell</option>
+				<option value="Chiffon">Chiffon</option>
+				<option value="Latex">Latex</option>
+            </select>
+            <input type="number" class="fabric-percentage" placeholder="%" min="1" max="100" required />
+          </div>
+        </div>
+        <button type="button" id="add-fabric-btn">+ Add Fabric</button>
+
+        <!-- Optional image upload -->
+        <label for="image-input">Upload Image (Optional):</label>
+        <input type="file" id="image-input" accept="image/*" />
+
+        <!-- Button changes from "Add Item" to "Save Changes" when editing -->
+        <button type="submit" id="submit-button">Add Item</button>
+      </form>
+    </section>
+
+    <!-- ====== TABLE ACTIONS (SEARCH, SORT, EXPORT/IMPORT) ====== -->
+    <section class="section">
+      <div class="actions-bar">
+        <input
+          type="text"
+          id="search-bar"
+          placeholder="Search items..."
+        />
+        <button class="action-btn sort-btn" id="sort-name-btn">Sort by Name</button>
+        <button class="action-btn sort-btn" id="sort-wash-btn">Sort by Washes</button>
+        <button class="action-btn sort-btn" id="sort-usage-btn">Sort by Usage</button>
+
+        <button class="action-btn" id="export-btn">Export Data</button>
+        <input type="file" id="import-file" accept=".json" />
+      </div>
+    </section>
+
+    <!-- ====== WARDROBE LIST TABLE ====== -->
+    <section class="section">
+      <h2>Wardrobe List</h2>
+      <table id="wardrobe-table">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Item Name</th>
+            <th>Category</th>
+            <th>Purchase Date</th>
+            <th>Usage Count</th>
+            <th>Last Used</th>
+            <th>Total Washes</th>
+            <th>Last Wash</th>
+            <th>Condition (%)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody><!-- Populated by JS --></tbody>
+      </table>
+    </section>
+
+    <!-- ====== USAGE HISTORY SECTION ====== -->
+    <section id="usage-history-section" class="history-section">
+      <h2>Usage History</h2>
+      <div id="usage-history-details" class="history-details"></div>
+      <button id="close-usage-history">Close</button>
+    </section>
+
+    <!-- ====== WASH HISTORY SECTION ====== -->
+    <section id="wash-history-section" class="history-section">
+      <h2>Wash History</h2>
+      <div id="wash-history-details" class="history-details"></div>
+      <button id="close-wash-history">Close</button>
+    </section>
+  </main>
+
+  <!-- Main script as a module -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
