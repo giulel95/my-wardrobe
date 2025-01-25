@@ -1,12 +1,22 @@
 /**
- * The main function to rebuild the wardrobe table in the DOM.
- * Called after any data changes.
+ * ui.js
+ * 
+ * Updated to show partial decimal percentages for condition (e.g., "72.3%").
+ * 
+ * IMPORTANT:
+ *  - We assume you replaced `condition.js` with the new version that calculates
+ *    partial decimals (using weeks, usage frequency, etc.).
+ *  - The rest of the code below is largely the same. The main change is how we
+ *    render the condition percentage in the table (no extra rounding).
  */
+
+// Main function to rebuild the wardrobe table in the DOM
 window.updateWardrobeTable = function() {
   const tbody = document.querySelector('#wardrobe-table tbody');
   tbody.innerHTML = '';
 
   window.wardrobeItems.forEach((item) => {
+    // Get the partial-decimal condition from the new `calculateCondition`
     const condPercent = window.calculateCondition(item);
 
     const usageCount = item.usageHistory.length;
@@ -15,8 +25,8 @@ window.updateWardrobeTable = function() {
     const washCount = item.washHistory.length;
     const lastWash = washCount > 0 ? item.washHistory[washCount - 1] : 'Never';
 
+    // Build a table row
     const row = document.createElement('tr');
-
     row.innerHTML = `
       <td class="image-cell">
         ${
@@ -32,6 +42,7 @@ window.updateWardrobeTable = function() {
       <td>${lastUse}</td>
       <td>${washCount}</td>
       <td>${lastWash}</td>
+      <!-- Show decimals if the returned value includes them -->
       <td>${condPercent}%</td>
       <td>
         <button class="action-btn usage-btn" onclick="addUsage(${item.id})">Use</button>
@@ -42,15 +53,14 @@ window.updateWardrobeTable = function() {
         <button class="action-btn delete-btn" onclick="deleteItem(${item.id})">Delete</button>
       </td>
     `;
-
     tbody.appendChild(row);
   });
 
-  // Optional: check for items needing wash reminders
+  // Check for items needing a wash (30+ days) - optional
   checkWashReminders();
 };
 
-/** Checks if last wash is >30 days old, logs a reminder. */
+// Checks if last wash is older than ~30 days, logs a reminder in the console
 function checkWashReminders() {
   const today = new Date();
   window.wardrobeItems.forEach((item) => {
@@ -64,7 +74,7 @@ function checkWashReminders() {
   });
 }
 
-/** Add a new fabric input row. */
+// Event listener for adding extra fabric rows
 document.getElementById('add-fabric-btn').addEventListener('click', function() {
   const fabricInputs = document.getElementById('fabric-inputs');
   const newField = document.createElement('div');
@@ -99,14 +109,12 @@ document.getElementById('add-fabric-btn').addEventListener('click', function() {
   fabricInputs.appendChild(newField);
 });
 
-/** Remove a single fabric row. */
+// Remove a single fabric input row
 window.removeFabricField = function(button) {
   button.parentElement.remove();
 };
 
-/** Sort & Search logic below **/
-
-// Sort by name/washes/usage
+// Sorting
 document.getElementById('sort-name-btn').addEventListener('click', () => sortItems('name'));
 document.getElementById('sort-wash-btn').addEventListener('click', () => sortItems('washHistory'));
 document.getElementById('sort-usage-btn').addEventListener('click', () => sortItems('usageHistory'));
@@ -123,7 +131,7 @@ function sortItems(field) {
   window.updateWardrobeTable();
 }
 
-// Search functionality
+// Searching
 document.getElementById('search-bar').addEventListener('keyup', filterTable);
 function filterTable() {
   const query = document.getElementById('search-bar').value.toLowerCase();
@@ -134,8 +142,7 @@ function filterTable() {
   });
 }
 
-/** Editing & Deleting Items **/
-
+// Editing & Deleting Items
 window.editItem = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -148,7 +155,7 @@ window.editItem = function(id) {
   document.getElementById('purchase-date').value = item.purchaseDate;
   document.getElementById('image-input').value = '';
 
-  // Rebuild the fabric inputs
+  // Rebuild fabric inputs from item.fabrics
   const fabricArea = document.getElementById('fabric-inputs');
   fabricArea.innerHTML = '';
   item.fabrics.forEach(f => {
@@ -182,6 +189,7 @@ window.editItem = function(id) {
       <button type="button" onclick="removeFabricField(this)">Remove</button>
     `;
     fabricArea.appendChild(field);
+
     // Set the actual values
     field.querySelector('.fabric-type').value = f.type;
     field.querySelector('.fabric-percentage').value = f.percentage;
