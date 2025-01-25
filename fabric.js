@@ -1,8 +1,15 @@
-// Category durability
+/**
+ * fabric.js
+ *
+ * A concise "most common fabrics" list, avoiding duplicates.
+ * Each has a `durabilityMultiplier` that you can tweak.
+ */
+
+// Category durability remains the same; only updating the fabricDurability list below.
+
 window.categoryDurability = {
   "Bra":        { maxUses: 60,  maxWashes: 40,  maxYears: 1.5 },
   "Panties":    { maxUses: 50,  maxWashes: 30,  maxYears: 1   },
-
   "T-shirt":    { maxUses: 100, maxWashes: 50,  maxYears: 2   },
   "Shirt":      { maxUses: 120, maxWashes: 60,  maxYears: 3   },
   "Jeans":      { maxUses: 200, maxWashes: 100, maxYears: 5   },
@@ -23,27 +30,21 @@ window.categoryDurability = {
   "Other":      { maxUses: 100, maxWashes: 50,  maxYears: 2   },
 };
 
-// Fabric durability multipliers
+/**
+ * A short, common fabrics list with no duplicates (polyamide = nylon, etc.).
+ * Adjust `durabilityMultiplier` to reflect real-world usage for each fabric.
+ */
 window.fabricDurability = {
-  "Cotton":    { durabilityMultiplier: 1.0 },
-  "Polyester": { durabilityMultiplier: 1.2 },
-  "Wool":      { durabilityMultiplier: 0.8 },
-  "Leather":   { durabilityMultiplier: 2.0 },
-  "Silk":      { durabilityMultiplier: 0.7 },
-  "Nylon":     { durabilityMultiplier: 1.3 },
-  "Linen":     { durabilityMultiplier: 1.0 },
-  "Acrylic":   { durabilityMultiplier: 0.9 },
-  "Spandex":   { durabilityMultiplier: 1.5 },
-  "Cashmere":  { durabilityMultiplier: 0.6 },
-  "Bamboo":    { durabilityMultiplier: 1.1 },
-  "Denim":     { durabilityMultiplier: 1.2 },
-  "Rayon":     { durabilityMultiplier: 0.9 },
-  "Viscose":   { durabilityMultiplier: 0.95 },
-  "Modal":     { durabilityMultiplier: 1.0 },
-  "Organza":   { durabilityMultiplier: 0.85 },
-  "Velvet":    { durabilityMultiplier: 0.8 },
-  "Satin":     { durabilityMultiplier: 0.8 },
-  "Lyocell":   { durabilityMultiplier: 1.05 },
-  "Chiffon":   { durabilityMultiplier: 0.75 },
-  "Latex":     { durabilityMultiplier: 1.3 },
+  "Cotton":               { durabilityMultiplier: 1.0 },
+  "Linen":                { durabilityMultiplier: 1.0 },
+  "Wool":                 { durabilityMultiplier: 0.8 },
+  "Silk":                 { durabilityMultiplier: 0.7 },
+  "Polyester":            { durabilityMultiplier: 1.2 },
+  "Nylon (Polyamide)":    { durabilityMultiplier: 1.3 },
+  "Spandex (Elastane)":   { durabilityMultiplier: 1.5 },
+  "Viscose (Rayon)":      { durabilityMultiplier: 0.9 },
+  "Acrylic":              { durabilityMultiplier: 0.9 },
+  "Leather":              { durabilityMultiplier: 2.0 },
+  "Hemp":                 { durabilityMultiplier: 1.3 },
+  "Denim":                { durabilityMultiplier: 1.2 },
 };
