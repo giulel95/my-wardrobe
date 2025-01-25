@@ -1,25 +1,56 @@
-/* ====== BASIC STYLES ====== */
-body {
-  font-family: Arial, sans-serif;
+/*****************************************************************************
+ * GLOBAL RESETS & DEFAULTS
+ *****************************************************************************/
+
+/* A simple CSS reset to normalize margins/padding */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f9;
 }
+
+/*****************************************************************************
+ * BASE STYLES
+ *****************************************************************************/
+
+html,
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.5;
+  /* Ensure body can grow; using minimal margin/padding for base layout */
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/*****************************************************************************
+ * HEADER
+ *****************************************************************************/
+
 header {
-  background-color: #4a90e2;
+  background-color: #4a90e2; /* brand color can be changed */
   color: white;
   text-align: center;
   padding: 1rem 0;
   margin-bottom: 1rem;
 }
+
+/*****************************************************************************
+ * LAYOUT CONTAINERS
+ *****************************************************************************/
+
 main {
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
 }
-h1, h2 {
-  margin: 0.5rem 0;
-}
+
 .section {
   background: white;
   padding: 1rem;
@@ -27,12 +58,20 @@ h1, h2 {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
 }
-/* ====== FORM STYLES ====== */
+
+/*****************************************************************************
+ * FORM & INPUTS
+ *****************************************************************************/
+
 form label {
   display: block;
   margin: 0.5rem 0 0.2rem;
+  font-weight: 600;
+  color: #555;
 }
-form input, form select {
+
+form input,
+form select {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -48,8 +87,8 @@ form input, form select {
 
 .fabric-group select,
 .fabric-group input {
-  width: auto;
   flex: 1;
+  min-width: 0; /* ensure they can shrink properly if needed */
 }
 
 form button {
@@ -60,14 +99,19 @@ form button {
   padding: 0.7rem 1.2rem;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: 600;
   margin-top: 0.5rem;
+  transition: background-color 0.2s ease;
 }
 
 form button:hover {
   background-color: #357ab8;
 }
 
-/* ====== TABLE STYLES ====== */
+/*****************************************************************************
+ * TABLE STYLES
+ *****************************************************************************/
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -75,62 +119,57 @@ table {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-table th, table td {
-  border: 1px solid #ddd;
-  padding: 0.8rem;
-  text-align: left;
-  vertical-align: middle;
-}
-table th {
+thead th {
   background-color: #4a90e2;
   color: white;
+  text-align: left;
+  padding: 0.8rem;
+  font-weight: 600;
 }
 
-table tbody tr:nth-child(even) {
+tbody tr:nth-child(even) {
   background-color: #f9f9f9;
 }
-table tbody tr:hover {
+
+tbody tr:hover {
   background-color: #f1f1f1;
 }
 
-/* ====== ACTION BUTTONS ====== */
-.action-btn {
-  padding: 0.4rem 0.8rem;
-  margin: 0 0.2rem;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 0.85rem;
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 0.8rem;
+  vertical-align: middle; /* keep content centered in row height */
 }
 
-.sort-btn {
-  background-color: #5c7df2;
-  color: white;
+/*****************************************************************************
+ * TABLE COLUMNS (OPTIONAL)
+ *****************************************************************************/
+
+/* Example: if you want specific widths for columns:
+table th:nth-child(1),
+table td:nth-child(1) {
+  width: 60px; / * For Image * /
+}
+table th:nth-child(10),
+table td:nth-child(10) {
+  width: 120px; / * For Temp Wear * /
+}
+table th:nth-child(11),
+table td:nth-child(11) {
+  width: 220px; / * For Actions * /
+}
+*/
+
+/*****************************************************************************
+ * IMAGE CELL
+ *****************************************************************************/
+
+.image-cell {
+  width: 60px;
+  text-align: center;
 }
 
-.usage-btn {
-  background-color: #17a2b8;
-  color: white;
-}
-.wash-btn {
-  background-color: #28a745;
-  color: white;
-}
-
-.history-btn {
-  background-color: #6c757d;
-  color: white;
-}
-.edit-btn {
-  background-color: #ffc107;
-  color: white;
-}
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-/* ====== IMAGE STYLES ====== */
 .item-image {
   width: 50px;
   height: 50px;
@@ -138,11 +177,100 @@ table tbody tr:hover {
   border-radius: 3px;
   border: 1px solid #ccc;
 }
-.image-cell {
-  width: 60px;
-  text-align: center;
+
+/*****************************************************************************
+ * ACTION BUTTONS
+ *****************************************************************************/
+
+.action-btn {
+  padding: 0.4rem 0.8rem;
+  margin: 0 0.2rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #fff;  /* default for typical background */
+  transition: background-color 0.2s ease;
 }
-/* ====== WASH & USAGE HISTORY SECTIONS ====== */
+
+.sort-btn {
+  background-color: #5c7df2;
+  margin-left: 0.5rem;
+}
+
+.sort-btn:hover {
+  background-color: #4a5df2;
+}
+
+/* Usage & Wash Buttons */
+.usage-btn {
+  background-color: #17a2b8; /* teal-like color */
+}
+.usage-btn:hover {
+  background-color: #13818f;
+}
+
+.wash-btn {
+  background-color: #28a745; /* green */
+}
+.wash-btn:hover {
+  background-color: #218838;
+}
+
+.history-btn {
+  background-color: #6c757d; /* gray */
+}
+.history-btn:hover {
+  background-color: #5a6268;
+}
+
+.edit-btn {
+  background-color: #ffc107; /* yellow */
+  color: #212529; /* override text to dark for contrast */
+}
+.edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.delete-btn {
+  background-color: #dc3545; /* red */
+}
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/*****************************************************************************
+ * TEMPORARY WEAR BUTTONS (OPTIONAL)
+ *****************************************************************************/
+
+/* If you want unique styles for "Wrinkle+" or "Odor+" etc.:
+button[data-temp-wrinkle] {
+  background-color: #b5651d; / * brownish? * /
+}
+*/
+
+/*****************************************************************************
+ * SEARCH & SORT BAR
+ *****************************************************************************/
+
+.actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.actions-bar input[type="text"] {
+  flex: 1;
+  max-width: 300px;
+  padding: 0.4rem;
+}
+
+/*****************************************************************************
+ * HISTORY SECTIONS
+ *****************************************************************************/
+
 .history-section {
   background: white;
   padding: 1rem;
@@ -155,7 +283,9 @@ table tbody tr:hover {
 .history-details ul {
   list-style-type: none;
   padding-left: 0;
+  margin-top: 0.5rem;
 }
+
 .history-details li {
   padding: 0.3rem 0;
   border-bottom: 1px solid #ccc;
@@ -170,21 +300,36 @@ table tbody tr:hover {
   font-size: 0.7rem;
   padding: 0.2rem 0.4rem;
   border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #fff;
+  background-color: #6c757d;
+}
+.history-details button:hover {
+  background-color: #5a6268;
 }
 
-/* ====== ACTIONS BAR ====== */
-.actions-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
+/*****************************************************************************
+ * RESPONSIVE EXAMPLE (OPTIONAL)
+ *****************************************************************************/
 
-.actions-bar input[type="text"] {
-  flex: 1;
-  max-width: 300px;
-}
+/* Example media query for narrow screens */
+@media (max-width: 768px) {
+  /* Adjust table to be more scrollable or use display: block if needed */
+  table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
 
-#export-btn, #import-file {
-  margin-left: 0.5rem;
+  thead, tbody, th, td, tr {
+    display: block; /* Convert to block layout for narrower screens if you prefer */
+  }
+
+  /* Adjust action buttons or text sizes for mobile */
+  .action-btn {
+    font-size: 0.75rem;
+    margin: 2px;
+  }
+}
