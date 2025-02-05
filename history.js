@@ -1,3 +1,6 @@
+/**
+ * Add usage date for an item. Prompt user for date or use today.
+ */
 window.addUsage = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -25,6 +28,9 @@ window.addUsage = function(id) {
   window.updateWardrobeTable();
 };
 
+/**
+ * View usage history in a dedicated section.
+ */
 window.viewUsageHistory = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -47,19 +53,19 @@ window.viewUsageHistory = function(id) {
   usageDetails.innerHTML = `
     <h3>${item.name} - Usage History</h3>
     <p>Total Usage: ${item.usageHistory.length}</p>
-    ${usageList}
+    ${usageList || '<p>No usage recorded.</p>'}
   `;
-
   usageSection.style.display = 'block';
 };
 
+/** Edit a usage date by index. */
 window.editUsageDate = function(itemId, usageIndex) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
   if (!item) return;
 
   const oldDate = item.usageHistory[usageIndex];
   const newDate = prompt("Enter new usage date (YYYY-MM-DD):", oldDate);
-  if (newDate === null) return;
+  if (newDate === null) return; // user cancelled
 
   const pattern = /^\d{4}-\d{2}-\d{2}$/;
   if (!pattern.test(newDate)) {
@@ -78,6 +84,7 @@ window.editUsageDate = function(itemId, usageIndex) {
   window.viewUsageHistory(itemId);
 };
 
+/** Delete a usage date from usageHistory. */
 window.deleteUsageDate = function(itemId, usageIndex) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
   if (!item) return;
@@ -88,10 +95,14 @@ window.deleteUsageDate = function(itemId, usageIndex) {
   window.viewUsageHistory(itemId);
 };
 
+// Close usage history
 document.getElementById('close-usage-history').addEventListener('click', () => {
   document.getElementById('usage-history-section').style.display = 'none';
 });
 
+/**
+ * Add wash date, prompt user for older or today's date.
+ */
 window.addWash = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -103,7 +114,7 @@ window.addWash = function(id) {
   } else {
     const pattern = /^\d{4}-\d{2}-\d{2}$/;
     if (!pattern.test(userInput)) {
-      alert("Invalid date format. Please use YYYY-MM-DD.");
+      alert("Invalid date format (YYYY-MM-DD).");
       return;
     }
     const testDate = new Date(userInput);
@@ -119,6 +130,9 @@ window.addWash = function(id) {
   window.updateWardrobeTable();
 };
 
+/**
+ * View wash history in a dedicated section.
+ */
 window.viewWashHistory = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -141,12 +155,12 @@ window.viewWashHistory = function(id) {
   washDetails.innerHTML = `
     <h3>${item.name} - Wash History</h3>
     <p>Total Washes: ${item.washHistory.length}</p>
-    ${washList}
+    ${washList || '<p>No washes recorded.</p>'}
   `;
-
   washSection.style.display = 'block';
 };
 
+/** Edit a wash date. */
 window.editWashDate = function(itemId, washIndex) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
   if (!item) return;
@@ -172,6 +186,7 @@ window.editWashDate = function(itemId, washIndex) {
   window.viewWashHistory(itemId);
 };
 
+/** Delete a wash date. */
 window.deleteWashDate = function(itemId, washIndex) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
   if (!item) return;
@@ -182,6 +197,7 @@ window.deleteWashDate = function(itemId, washIndex) {
   window.viewWashHistory(itemId);
 };
 
+// Close wash history
 document.getElementById('close-wash-history').addEventListener('click', () => {
   document.getElementById('wash-history-section').style.display = 'none';
 });
