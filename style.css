@@ -1,5 +1,5 @@
 /*****************************************************************************
- * GLOBAL RESETS & DEFAULTS
+ * GLOBAL RESET & BASE
  *****************************************************************************/
 
 *,
@@ -27,7 +27,7 @@ img {
  *****************************************************************************/
 
 header {
-  background-color: #4a90e2; /* brand color can be changed */
+  background-color: #4a90e2;
   color: white;
   text-align: center;
   padding: 1rem 0;
@@ -53,7 +53,7 @@ main {
 }
 
 /*****************************************************************************
- * FORMS & INPUTS
+ * FORM STYLES
  *****************************************************************************/
 
 form label {
@@ -81,7 +81,6 @@ form select {
 .fabric-group select,
 .fabric-group input {
   flex: 1;
-  min-width: 0;
 }
 
 form button {
@@ -102,7 +101,7 @@ form button:hover {
 }
 
 /*****************************************************************************
- * TABLE STYLES
+ * TABLE
  *****************************************************************************/
 
 table {
@@ -153,7 +152,7 @@ td {
 }
 
 /*****************************************************************************
- * ACTION BUTTONS (Usage, Wash, Edit, Delete, etc.)
+ * ACTION BUTTONS
  *****************************************************************************/
 
 .action-btn {
@@ -176,28 +175,28 @@ td {
 }
 
 .usage-btn {
-  background-color: #17a2b8; /* teal-like */
+  background-color: #17a2b8;
 }
 .usage-btn:hover {
   background-color: #13818f;
 }
 
 .wash-btn {
-  background-color: #28a745; /* green */
+  background-color: #28a745;
 }
 .wash-btn:hover {
   background-color: #218838;
 }
 
 .history-btn {
-  background-color: #6c757d; /* gray */
+  background-color: #6c757d;
 }
 .history-btn:hover {
   background-color: #5a6268;
 }
 
 .edit-btn {
-  background-color: #ffc107; /* yellow */
+  background-color: #ffc107;
   color: #212529;
 }
 .edit-btn:hover {
@@ -205,77 +204,36 @@ td {
 }
 
 .delete-btn {
-  background-color: #dc3545; /* red */
+  background-color: #dc3545;
 }
 .delete-btn:hover {
   background-color: #c82333;
 }
 
 /*****************************************************************************
- * ADVANCED TEMP WEAR BUTTONS
+ * TEMP WEAR BUTTONS (dry, pilling, fade)
  *****************************************************************************/
 
-/* 
-   If you'd like dryness/pilling/fade each to have a unique color, define 
-   separate classes for them. 
-   Alternatively, define one .temp-wear-btn for all advanced conditions.
-*/
-
-/* dryness => a brownish color: #b5651d */
 .dry-btn {
-  background-color: #b5651d;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.8rem;
-  margin: 0.2rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  background-color: #b5651d; /* Brownish for dryness */
 }
 .dry-btn:hover {
   background-color: #9a4f1a;
 }
 
-/* pilling => a purple color: #6f42c1 */
 .pilling-btn {
-  background-color: #6f42c1;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.8rem;
-  margin: 0.2rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  background-color: #6f42c1; /* Purple */
 }
 .pilling-btn:hover {
   background-color: #5f369f;
 }
 
-/* colorFade => a pinkish color: #d63384 */
 .fade-btn {
-  background-color: #d63384;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.8rem;
-  margin: 0.2rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  background-color: #d63384; /* Pinkish */
 }
 .fade-btn:hover {
   background-color: #b82a6a;
 }
-
-/* 
-   If you'd rather unify them under a single .temp-wear-btn class with one color:
-   .temp-wear-btn {
-     background-color: #6c757d;
-     ...
-   }
-*/
 
 /*****************************************************************************
  * SEARCH & SORT BAR
@@ -293,6 +251,29 @@ td {
   flex: 1;
   max-width: 300px;
   padding: 0.4rem;
+}
+
+/*****************************************************************************
+ * REMINDERS SECTION
+ *****************************************************************************/
+
+#reminders-section {
+  /* This is the outer section for reminders */
+}
+
+#reminders-box {
+  padding: 0.5rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  min-height: 50px;
+}
+
+#reminders-box p {
+  margin: 0.5rem 0;
+  line-height: 1.4;
+  /* optional color coding? */
+  /* color: #cc0000; */
 }
 
 /*****************************************************************************
@@ -333,13 +314,12 @@ td {
   color: #fff;
   background-color: #6c757d;
 }
-
 .history-details button:hover {
   background-color: #5a6268;
 }
 
 /*****************************************************************************
- * RESPONSIVE EXAMPLE (OPTIONAL)
+ * RESPONSIVE EXAMPLE
  *****************************************************************************/
 
 @media (max-width: 768px) {
@@ -347,16 +327,5 @@ td {
     display: block;
     overflow-x: auto;
   }
-
-  /* Example: display each row as block if you prefer, or keep it as is. */
-  thead, tbody, tr, th, td {
-    /* Uncomment for full block layout:
-    display: block;
-    */
-  }
-
-  .action-btn {
-    font-size: 0.75rem;
-    margin: 2px;
-  }
+  /* Possibly convert tr/td to block if you prefer a mobile layout. */
 }
