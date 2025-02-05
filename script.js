@@ -1,40 +1,20 @@
 /**
  * script.js
- *
- * Main entry point: handles form submission and wiring up the "Scrape Product" feature.
- * This file uses global functions from data.js, fabric.js, condition.js, history.js, ui.js, and scraper.js.
+ * 
+ * This final file wires everything together. Because we are using normal <script> tags,
+ * there's no "import" statements. We rely on the global functions
+ * (e.g., window.updateWardrobeTable, window.wardrobeItems, etc.)
  */
 
-// When the page loads, load data and build the table.
+// On page load, do the following:
 window.addEventListener('load', () => {
+  // Load from localStorage
   window.loadWardrobeItemsFromStorage();
+  // Build the table
   window.updateWardrobeTable();
 });
 
-// --- Event Listener for Scraping Product Data ---
-document.getElementById('scrape-button').addEventListener('click', async function() {
-  const urlInput = document.getElementById('product-url').value.trim();
-  if (!urlInput) {
-    alert("Please enter a product URL.");
-    return;
-  }
-  try {
-    const productData = await window.scrapeProductData(urlInput);
-    // If productData was successfully fetched, populate the form.
-    // For example, update the item name field with the product title.
-    if (productData.title) {
-      document.getElementById('item-name').value = productData.title;
-    }
-    // Optionally, you can store the product image URL somewhere or show a preview.
-    // For example, you might auto-fill an image field if you have one.
-    // Note: For security reasons, you may need to download the image or allow user confirmation.
-    alert("Scraped product data successfully! Please verify and complete other fields if needed.");
-  } catch (error) {
-    alert("Failed to scrape product data. See console for details.");
-  }
-});
-
-// --- Form Submission for Adding/Editing an Item ---
+// Handle form submission: add or edit an item
 document.getElementById('wardrobe-form').addEventListener('submit', async function(e) {
   e.preventDefault();
 
@@ -42,7 +22,7 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
   const category = document.getElementById('category').value;
   const purchaseDate = document.getElementById('purchase-date').value;
 
-  // Gather fabrics from fabric inputs.
+  // Gather fabrics
   const fabricGroups = document.querySelectorAll('.fabric-group');
   const fabrics = [];
   fabricGroups.forEach(group => {
@@ -50,7 +30,7 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
     const perc = parseInt(group.querySelector('.fabric-percentage').value, 10);
     fabrics.push({ type, percentage: perc });
   });
-  // Check that fabrics sum to 100%
+  // Check total = 100
   const totalPerc = fabrics.reduce((sum, f) => sum + f.percentage, 0);
   if (totalPerc !== 100) {
     alert("Fabrics must total 100%!");
@@ -64,8 +44,9 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
     imageData = await readFileAsBase64(imageInput.files[0]);
   }
 
+  // Determine if editing or adding
   if (window.editingItemId) {
-    // Edit existing item.
+    // Edit existing
     const idx = window.wardrobeItems.findIndex(i => i.id === window.editingItemId);
     if (idx > -1) {
       window.wardrobeItems[idx].name = itemName;
@@ -79,8 +60,9 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
     window.editingItemId = null;
     document.getElementById('form-title').textContent = 'Add a Wardrobe Item';
     document.getElementById('submit-button').textContent = 'Add Item';
+
   } else {
-    // Create new item.
+    // Add new
     const newItem = {
       id: Date.now(),
       name: itemName,
@@ -90,24 +72,18 @@ document.getElementById('wardrobe-form').addEventListener('submit', async functi
       image: imageData,
       usageHistory: [],
       washHistory: [],
-      // Optionally, you can add default temporary wear:
-      wearAndTear: {
-        wrinkles: false,
-        odors: false,
-        stains: { level: 0 },
-        elasticityLoss: false,
-        surfaceDirt: { level: 0 },
-      }
     };
     window.wardrobeItems.push(newItem);
   }
 
   window.saveWardrobeItemsToStorage();
   window.updateWardrobeTable();
+
+  // Reset form
   this.reset();
 });
 
-/** Helper: Convert file to base64 string. */
+/** Helper: read file as base64 */
 async function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
