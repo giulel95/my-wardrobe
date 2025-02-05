@@ -1,31 +1,22 @@
 /********************************************************************************
  * ui.js
  *
- * Builds the wardrobe table, displaying:
- *  - columns for item data,
- *  - a separate "Temp Wear" column,
- *  - a separate "Actions" column for usage/wash/temporary-wear toggles.
+ * Builds the table (including Temp Wear, Condition, etc.),
+ * provides sorting & searching,
+ * and includes the "Add from Link" scraping logic on the client side.
  ********************************************************************************/
 
-/**
- * Rebuild the main wardrobe table in the DOM.
- */
 window.updateWardrobeTable = function() {
   const tbody = document.querySelector('#wardrobe-table tbody');
   tbody.innerHTML = '';
 
   window.wardrobeItems.forEach((item) => {
-    // 1) Calculate item condition (0..100%)
     const condPercent = window.calculateCondition(item);
-
-    // 2) Basic usage/wash stats
     const usageCount = item.usageHistory.length;
     const lastUse = usageCount > 0 ? item.usageHistory[usageCount - 1] : 'Never';
-
     const washCount = item.washHistory.length;
     const lastWash = washCount > 0 ? item.washHistory[washCount - 1] : 'Never';
 
-    // 3) Temporary Wear
     const tempWear = item.wearAndTear || {
       wrinkles: false,
       odors: false,
@@ -34,13 +25,12 @@ window.updateWardrobeTable = function() {
       surfaceDirt: { level: 0 },
     };
     const tempWearDesc = [];
-    if (tempWear.wrinkles)               tempWearDesc.push("Wrinkles");
-    if (tempWear.odors)                  tempWearDesc.push("Odors");
-    if (tempWear.stains.level > 0)       tempWearDesc.push(`Stains (L${tempWear.stains.level})`);
-    if (tempWear.elasticityLoss)         tempWearDesc.push("Elasticity Loss");
-    if (tempWear.surfaceDirt.level > 0)  tempWearDesc.push(`Dirt (L${tempWear.surfaceDirt.level})`);
+    if (tempWear.wrinkles) tempWearDesc.push("Wrinkles");
+    if (tempWear.odors) tempWearDesc.push("Odors");
+    if ((tempWear.stains.level || 0) > 0) tempWearDesc.push(`Stains (L${tempWear.stains.level})`);
+    if (tempWear.elasticityLoss) tempWearDesc.push("Elasticity Loss");
+    if ((tempWear.surfaceDirt.level || 0) > 0) tempWearDesc.push(`Dirt (L${tempWear.surfaceDirt.level})`);
 
-    // 4) Create a table row
     const row = document.createElement('tr');
     row.innerHTML = `
       <td class="image-cell">
@@ -60,35 +50,28 @@ window.updateWardrobeTable = function() {
       <td>${condPercent}%</td>
       <td>${tempWearDesc.join(", ") || "None"}</td>
       <td>
-        <!-- All the ACTION BUTTONS in a separate column -->
         <button class="action-btn usage-btn" onclick="addUsage(${item.id})">Use</button>
         <button class="action-btn wash-btn" onclick="addWash(${item.id})">Wash</button>
         <button class="action-btn history-btn" onclick="viewUsageHistory(${item.id})">Usage Hist</button>
         <button class="action-btn history-btn" onclick="viewWashHistory(${item.id})">Wash Hist</button>
 
-        <!-- Example buttons for temporary wear -->
+        <!-- Temporary Wear example buttons -->
         <button onclick="addTemporaryWear(${item.id}, 'wrinkles', true)">Wrinkle+</button>
         <button onclick="addTemporaryWear(${item.id}, 'odors', true)">Odor+</button>
         <button onclick="addTemporaryWear(${item.id}, 'stains', { level:2 })">Stain L2</button>
         <button onclick="resetTemporaryWear(${item.id})">Resolve Wear</button>
-        
+
         <!-- Edit/Delete item -->
         <button class="action-btn edit-btn" onclick="editItem(${item.id})">Edit</button>
         <button class="action-btn delete-btn" onclick="deleteItem(${item.id})">Delete</button>
       </td>
     `;
-
-    // Add row to table
     tbody.appendChild(row);
   });
 
-  // Optionally check wash reminders
   checkWashReminders();
 };
 
-/**
- * Logs a reminder if an item wasn't washed for 30+ days.
- */
 function checkWashReminders() {
   const today = new Date();
   window.wardrobeItems.forEach(item => {
@@ -103,10 +86,7 @@ function checkWashReminders() {
   });
 }
 
-/**
- * "Add Fabric" event listener for the form:
- * Creates a new row of fabric inputs (short list, no duplicates).
- */
+/** For adding an extra fabric row in the form */
 document.getElementById('add-fabric-btn').addEventListener('click', function() {
   const fabricInputs = document.getElementById('fabric-inputs');
   const newField = document.createElement('div');
@@ -132,14 +112,11 @@ document.getElementById('add-fabric-btn').addEventListener('click', function() {
   fabricInputs.appendChild(newField);
 });
 
-/** Removes a fabric input row. */
 window.removeFabricField = function(button) {
   button.parentElement.remove();
 };
 
-/**
- * Sorting logic by name/washes/usage
- */
+/** Sorting by name/washes/usage */
 document.getElementById('sort-name-btn').addEventListener('click', () => sortItems('name'));
 document.getElementById('sort-wash-btn').addEventListener('click', () => sortItems('washHistory'));
 document.getElementById('sort-usage-btn').addEventListener('click', () => sortItems('usageHistory'));
@@ -156,22 +133,18 @@ function sortItems(field) {
   window.updateWardrobeTable();
 }
 
-/**
- * Searching logic (filter items by name).
- */
+/** Searching by item name */
 document.getElementById('search-bar').addEventListener('keyup', filterTable);
 function filterTable() {
   const query = document.getElementById('search-bar').value.toLowerCase();
   const rows = document.querySelectorAll('#wardrobe-table tbody tr');
   rows.forEach(row => {
-    const itemName = row.cells[1].textContent.toLowerCase(); // name in col index 1
+    const itemName = row.cells[1].textContent.toLowerCase();
     row.style.display = itemName.includes(query) ? '' : 'none';
   });
 }
 
-/**
- * Edit item: pre-fill form fields, rebuild fabric list, etc.
- */
+/** Edit item (pre-fill the form) */
 window.editItem = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -183,7 +156,6 @@ window.editItem = function(id) {
   document.getElementById('purchase-date').value = item.purchaseDate;
   document.getElementById('image-input').value = '';
 
-  // Rebuild fabric inputs
   const fabricArea = document.getElementById('fabric-inputs');
   fabricArea.innerHTML = '';
   if (Array.isArray(item.fabrics)) {
@@ -210,7 +182,6 @@ window.editItem = function(id) {
       `;
       fabricArea.appendChild(field);
 
-      // Set actual values
       field.querySelector('.fabric-type').value = f.type;
       field.querySelector('.fabric-percentage').value = f.percentage;
     });
@@ -220,9 +191,7 @@ window.editItem = function(id) {
   document.getElementById('submit-button').textContent = 'Save Changes';
 };
 
-/**
- * Delete item from array and refresh table.
- */
+/** Delete item */
 window.deleteItem = function(id) {
   const idx = window.wardrobeItems.findIndex(i => i.id === id);
   if (idx !== -1) {
@@ -231,3 +200,85 @@ window.deleteItem = function(id) {
     window.updateWardrobeTable();
   }
 };
+
+/******************************************************************************
+ * ADD AN ITEM FROM LINK (SCRAPING) 
+ ******************************************************************************/
+document.getElementById('fetch-link-btn').addEventListener('click', async function() {
+  const linkInput = document.getElementById('product-link');
+  const productUrl = linkInput.value.trim();
+  if (!productUrl) {
+    alert('Please enter a valid product URL.');
+    return;
+  }
+
+  try {
+    // Call the Node scraping server
+    const response = await fetch(`http://localhost:3000/scrape?url=${encodeURIComponent(productUrl)}`);
+    if (!response.ok) {
+      throw new Error(`Scraping server error: ${response.status}`);
+    }
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(`Failed to scrape: ${JSON.stringify(data)}`);
+    }
+
+    displayScrapeResult(data, productUrl);
+  } catch (err) {
+    console.error(err);
+    alert('Failed to fetch product info from scraping server.');
+  }
+});
+
+function displayScrapeResult(data, productUrl) {
+  const resultDiv = document.getElementById('scrape-result');
+  resultDiv.innerHTML = '';
+
+  let name = data.name || 'Unnamed Product';
+  let image = data.image || '';
+
+  const preview = document.createElement('div');
+  preview.style.border = '1px solid #ccc';
+  preview.style.padding = '1rem';
+  preview.style.borderRadius = '5px';
+  preview.style.marginTop = '0.5rem';
+
+  preview.innerHTML = `
+    <p><strong>Product Name:</strong> ${name}</p>
+    ${image ? `<img src="${image}" alt="Product" style="max-width: 200px;">` : ''}
+    <p><strong>Link:</strong> <a href="${productUrl}" target="_blank">${productUrl}</a></p>
+    <button id="confirm-add-link-item">Add This Item</button>
+  `;
+
+  resultDiv.appendChild(preview);
+
+  document.getElementById('confirm-add-link-item').addEventListener('click', function() {
+    addItemFromScrape(name, image, productUrl);
+    resultDiv.innerHTML = 'Item added to your wardrobe!';
+  });
+}
+
+function addItemFromScrape(name, image, productUrl) {
+  const newItem = {
+    id: Date.now(),
+    name,
+    category: 'Other',
+    purchaseDate: new Date().toISOString().split('T')[0],
+    productLink: productUrl,
+    image,
+    usageHistory: [],
+    washHistory: [],
+    fabrics: [],
+    wearAndTear: {
+      wrinkles: false,
+      odors: false,
+      stains: { level: 0 },
+      elasticityLoss: false,
+      surfaceDirt: { level: 0 },
+    },
+  };
+
+  window.wardrobeItems.push(newItem);
+  window.saveWardrobeItemsToStorage();
+  window.updateWardrobeTable();
+}
