@@ -1,13 +1,9 @@
 /******************************************************************************
  * temporaryWear.js
  *
- * Extends the temporary wear system to include:
- *  - dryness (for leather/suede) => level 0..3
- *  - pilling (for wool/acrylic) => level 0..3
- *  - colorFade => level 0..3
- * 
- * This file manages adding or resetting these advanced wear states, 
- * just like stains, wrinkles, etc.
+ * Manages new multi-level "stains" (0..3) and possibly other conditions
+ * like dryness, pilling, colorFade. If "stains" was a boolean before,
+ * your data migration code in data.js ensures it's now { level: 0..3 }.
  ******************************************************************************/
 
 // Default structure for advanced temporary wear
@@ -15,19 +11,20 @@ function defaultWearAndTear() {
   return {
     wrinkles: false,
     odors: false,
-    stains: { level: 0 },
+    stains: { level: 0 },      // multi-level for stains
     elasticityLoss: false,
     surfaceDirt: { level: 0 },
-    // NEW advanced conditions:
-    dryness: { level: 0 },   // e.g., for leather or suede
-    pilling: { level: 0 },   // e.g., for wool, acrylic
-    colorFade: { level: 0 }, // for dyed fabrics
+    dryness: { level: 0 },
+    pilling: { level: 0 },
+    colorFade: { level: 0 },
   };
 }
 
 /**
  * addTemporaryWear(itemId, condition, value):
- *  - Extends the logic to handle dryness, pilling, colorFade with levels.
+ *  - If condition is "stains", we set { level: X }.
+ *  - If condition is dryness/pilling/colorFade => set { level: X }
+ *  - If condition is boolean-based => set true/false
  */
 window.addTemporaryWear = function (itemId, condition, value = true) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
@@ -37,18 +34,20 @@ window.addTemporaryWear = function (itemId, condition, value = true) {
     item.wearAndTear = defaultWearAndTear();
   }
 
-  // If the condition is level-based (dryness, pilling, colorFade, stains, surfaceDirt):
+  // If it's a level-based property
   if (["stains","surfaceDirt","dryness","pilling","colorFade"].includes(condition)) {
     if (typeof value === "object" && value.level !== undefined) {
+      // e.g. addTemporaryWear(itemId, 'stains', { level:2 })
       item.wearAndTear[condition] = { level: value.level };
     } else if (typeof value === "number") {
+      // e.g. addTemporaryWear(itemId, 'stains', 2)
       item.wearAndTear[condition] = { level: value };
     } else {
-      // fallback
+      // fallback => set to 1
       item.wearAndTear[condition] = { level: 1 };
     }
   } else {
-    // e.g. wrinkles, odors, elasticityLoss => boolean
+    // e.g. wrinkles, odors => boolean
     item.wearAndTear[condition] = value;
   }
 
@@ -58,7 +57,7 @@ window.addTemporaryWear = function (itemId, condition, value = true) {
 
 /**
  * incrementWearLevel(itemId, condition, increment):
- *  - Helper to easily increment dryness, pilling, colorFade, or stains.
+ *  - Easy way to bump up dryness/pilling/stains/colorFade by a certain increment
  */
 window.incrementWearLevel = function(itemId, condition, increment = 1) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
@@ -78,7 +77,7 @@ window.incrementWearLevel = function(itemId, condition, increment = 1) {
 
 /**
  * resetTemporaryWear(itemId):
- *  - Clears all advanced temporary wear states, including dryness/pilling/fade.
+ *  - Clear all advanced wear states (wrinkles, odors, dryness, pilling, colorFade, etc.)
  */
 window.resetTemporaryWear = function (itemId) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
