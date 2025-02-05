@@ -2,7 +2,6 @@
  * GLOBAL RESETS & DEFAULTS
  *****************************************************************************/
 
-/* A simple CSS reset to normalize margins/padding */
 *,
 *::before,
 *::after {
@@ -11,17 +10,12 @@
   padding: 0;
 }
 
-/*****************************************************************************
- * BASE STYLES
- *****************************************************************************/
-
 html,
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f9;
   color: #333;
   line-height: 1.5;
-  /* Ensure body can grow; using minimal margin/padding for base layout */
 }
 
 img {
@@ -34,7 +28,7 @@ img {
  *****************************************************************************/
 
 header {
-  background-color: #4a90e2; /* brand color can be changed */
+  background-color: #4a90e2;
   color: white;
   text-align: center;
   padding: 1rem 0;
@@ -42,7 +36,7 @@ header {
 }
 
 /*****************************************************************************
- * LAYOUT CONTAINERS
+ * MAIN LAYOUT
  *****************************************************************************/
 
 main {
@@ -88,7 +82,7 @@ form select {
 .fabric-group select,
 .fabric-group input {
   flex: 1;
-  min-width: 0; /* ensure they can shrink properly if needed */
+  min-width: 0;
 }
 
 form button {
@@ -139,30 +133,11 @@ th,
 td {
   border: 1px solid #ddd;
   padding: 0.8rem;
-  vertical-align: middle; /* keep content centered in row height */
+  vertical-align: middle;
 }
 
 /*****************************************************************************
- * TABLE COLUMNS (OPTIONAL)
- *****************************************************************************/
-
-/* Example: if you want specific widths for columns:
-table th:nth-child(1),
-table td:nth-child(1) {
-  width: 60px; / * For Image * /
-}
-table th:nth-child(10),
-table td:nth-child(10) {
-  width: 120px; / * For Temp Wear * /
-}
-table th:nth-child(11),
-table td:nth-child(11) {
-  width: 220px; / * For Actions * /
-}
-*/
-
-/*****************************************************************************
- * IMAGE CELL
+ * TABLE: IMAGE CELL
  *****************************************************************************/
 
 .image-cell {
@@ -189,7 +164,7 @@ table td:nth-child(11) {
   border-radius: 3px;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #fff;  /* default for typical background */
+  color: #fff;
   transition: background-color 0.2s ease;
 }
 
@@ -197,60 +172,48 @@ table td:nth-child(11) {
   background-color: #5c7df2;
   margin-left: 0.5rem;
 }
-
 .sort-btn:hover {
   background-color: #4a5df2;
 }
 
-/* Usage & Wash Buttons */
 .usage-btn {
-  background-color: #17a2b8; /* teal-like color */
+  background-color: #17a2b8;
 }
 .usage-btn:hover {
   background-color: #13818f;
 }
 
 .wash-btn {
-  background-color: #28a745; /* green */
+  background-color: #28a745;
 }
 .wash-btn:hover {
   background-color: #218838;
 }
 
 .history-btn {
-  background-color: #6c757d; /* gray */
+  background-color: #6c757d;
 }
 .history-btn:hover {
   background-color: #5a6268;
 }
 
 .edit-btn {
-  background-color: #ffc107; /* yellow */
-  color: #212529; /* override text to dark for contrast */
+  background-color: #ffc107;
+  color: #212529;
 }
 .edit-btn:hover {
   background-color: #e0a800;
 }
 
 .delete-btn {
-  background-color: #dc3545; /* red */
+  background-color: #dc3545;
 }
 .delete-btn:hover {
   background-color: #c82333;
 }
 
 /*****************************************************************************
- * TEMPORARY WEAR BUTTONS (OPTIONAL)
- *****************************************************************************/
-
-/* If you want unique styles for "Wrinkle+" or "Odor+" etc.:
-button[data-temp-wrinkle] {
-  background-color: #b5651d; / * brownish? * /
-}
-*/
-
-/*****************************************************************************
- * SEARCH & SORT BAR
+ * SEARCH & ACTION BAR
  *****************************************************************************/
 
 .actions-bar {
@@ -311,23 +274,24 @@ button[data-temp-wrinkle] {
 }
 
 /*****************************************************************************
- * RESPONSIVE EXAMPLE (OPTIONAL)
+ * RESPONSIVE EXAMPLE
  *****************************************************************************/
 
-/* Example media query for narrow screens */
 @media (max-width: 768px) {
-  /* Adjust table to be more scrollable or use display: block if needed */
   table {
     width: 100%;
     overflow-x: auto;
     display: block;
   }
-
-  thead, tbody, th, td, tr {
-    display: block; /* Convert to block layout for narrower screens if you prefer */
+  
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block; /* convert to block layout if you want a stacked approach */
   }
 
-  /* Adjust action buttons or text sizes for mobile */
   .action-btn {
     font-size: 0.75rem;
     margin: 2px;
