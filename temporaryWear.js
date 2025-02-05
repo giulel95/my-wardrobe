@@ -1,95 +1,90 @@
 /******************************************************************************
  * temporaryWear.js
  *
- * Manages advanced multi-level "stains" for each item, plus other temporary
- * wear conditions (wrinkles, odors, etc.) if you want to expand them similarly.
- *
- * This version introduces a "stains.level" property (0..3) by default.
+ * Extends the temporary wear system to include:
+ *  - dryness (for leather/suede) => level 0..3
+ *  - pilling (for wool/acrylic) => level 0..3
+ *  - colorFade => level 0..3
+ * 
+ * This file manages adding or resetting these advanced wear states, 
+ * just like stains, wrinkles, etc.
  ******************************************************************************/
 
-// Default structure for temporary wear (when none exists yet).
+// Default structure for advanced temporary wear
 function defaultWearAndTear() {
   return {
     wrinkles: false,
     odors: false,
-    // NEW: multi-level stains, 0..3 (you can allow higher if you want)
     stains: { level: 0 },
     elasticityLoss: false,
-    // Example of multi-level surfaceDirt too, if you want:
     surfaceDirt: { level: 0 },
+    // NEW advanced conditions:
+    dryness: { level: 0 },   // e.g., for leather or suede
+    pilling: { level: 0 },   // e.g., for wool, acrylic
+    colorFade: { level: 0 }, // for dyed fabrics
   };
 }
 
 /**
- * Add or update ANY temporary wear condition for an item:
- *  e.g., set wrinkles => true, or set an advanced stain level.
- *
- * For multi-level stains, pass { level: X }, where 0..3 are typical.
+ * addTemporaryWear(itemId, condition, value):
+ *  - Extends the logic to handle dryness, pilling, colorFade with levels.
  */
 window.addTemporaryWear = function (itemId, condition, value = true) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
   if (!item) return;
 
-  // Ensure the wearAndTear object exists
   if (!item.wearAndTear) {
     item.wearAndTear = defaultWearAndTear();
   }
 
-  // If the condition is "stains" or "surfaceDirt" or any "level-based" property:
-  if (condition === "stains" || condition === "surfaceDirt") {
+  // If the condition is level-based (dryness, pilling, colorFade, stains, surfaceDirt):
+  if (["stains","surfaceDirt","dryness","pilling","colorFade"].includes(condition)) {
     if (typeof value === "object" && value.level !== undefined) {
-      // e.g. { level: 2 }
       item.wearAndTear[condition] = { level: value.level };
     } else if (typeof value === "number") {
       item.wearAndTear[condition] = { level: value };
     } else {
-      // fallback if missing
+      // fallback
       item.wearAndTear[condition] = { level: 1 };
     }
   } else {
-    // e.g. wrinkles = true, odors = true, elasticityLoss = true
+    // e.g. wrinkles, odors, elasticityLoss => boolean
     item.wearAndTear[condition] = value;
   }
-
-  // (Optional) if user is wearing an item with a high stain level again,
-  // auto-escalate it if you want:
-  // if (condition === 'stains' && item.wearAndTear.stains.level >= 3) {
-  //   // you could degrade permanent condition or do more logic here
-  // }
 
   window.saveWardrobeItemsToStorage();
   window.updateWardrobeTable();
 };
 
 /**
- * Reset (clear) all temporary wear for an item, e.g. after a thorough wash/clean.
+ * incrementWearLevel(itemId, condition, increment):
+ *  - Helper to easily increment dryness, pilling, colorFade, or stains.
+ */
+window.incrementWearLevel = function(itemId, condition, increment = 1) {
+  const item = window.wardrobeItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  if (!item.wearAndTear) {
+    item.wearAndTear = defaultWearAndTear();
+  }
+  const oldLevel = item.wearAndTear[condition]?.level || 0;
+  let newLevel = oldLevel + increment;
+  if (newLevel > 3) newLevel = 3; // cap at 3
+  item.wearAndTear[condition] = { level: newLevel };
+
+  window.saveWardrobeItemsToStorage();
+  window.updateWardrobeTable();
+};
+
+/**
+ * resetTemporaryWear(itemId):
+ *  - Clears all advanced temporary wear states, including dryness/pilling/fade.
  */
 window.resetTemporaryWear = function (itemId) {
   const item = window.wardrobeItems.find(i => i.id === itemId);
   if (!item) return;
 
   item.wearAndTear = defaultWearAndTear();
-  window.saveWardrobeItemsToStorage();
-  window.updateWardrobeTable();
-};
-
-/**
- * (Optional) If you want a helper to *increment* the stain level:
- */
-window.incrementStainLevel = function(itemId, increment = 1) {
-  const item = window.wardrobeItems.find(i => i.id === itemId);
-  if (!item) return;
-
-  if (!item.wearAndTear) {
-    item.wearAndTear = defaultWearAndTear();
-  }
-  const currentLevel = item.wearAndTear.stains?.level || 0;
-  let newLevel = currentLevel + increment;
-
-  // cap at 3, for example
-  if (newLevel > 3) newLevel = 3;
-  item.wearAndTear.stains = { level: newLevel };
-
   window.saveWardrobeItemsToStorage();
   window.updateWardrobeTable();
 };
