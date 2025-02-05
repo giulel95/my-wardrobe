@@ -1,3 +1,12 @@
+/**
+ * fabric.js
+ *
+ * A concise "most common fabrics" list, avoiding duplicates.
+ * Each has a `durabilityMultiplier` that you can tweak.
+ */
+
+// Category durability remains the same; only updating the fabricDurability list below.
+
 window.categoryDurability = {
   "Bra":        { maxUses: 60,  maxWashes: 40,  maxYears: 1.5 },
   "Panties":    { maxUses: 50,  maxWashes: 30,  maxYears: 1   },
@@ -21,6 +30,10 @@ window.categoryDurability = {
   "Other":      { maxUses: 100, maxWashes: 50,  maxYears: 2   },
 };
 
+/**
+ * A short, common fabrics list with no duplicates (polyamide = nylon, etc.).
+ * Adjust `durabilityMultiplier` to reflect real-world usage for each fabric.
+ */
 window.fabricDurability = {
   "Cotton":               { durabilityMultiplier: 1.0 },
   "Linen":                { durabilityMultiplier: 1.0 },
