@@ -1,61 +1,71 @@
 /********************************************************************************
  * ui.js
  *
- * Updated to incorporate multi-level stains in the table, plus a "Stain++" button
- * that increments the stain level for demonstration. The rest remains the same
- * as your standard wardrobe UI code (sorting, searching, usage/wash, etc.).
+ * Includes dryness, pilling, colorFade in the "Temp Wear" column. 
+ * Adds example buttons "Dry++", "Pill++", "Fade++" for demonstration.
  ********************************************************************************/
 
-/**
- * Rebuild the main wardrobe table in the DOM.
- */
 window.updateWardrobeTable = function() {
   const tbody = document.querySelector('#wardrobe-table tbody');
   tbody.innerHTML = '';
 
   window.wardrobeItems.forEach((item) => {
-    // 1) Condition (0..100%)
+    // Condition
     const condPercent = window.calculateCondition(item);
 
-    // 2) Usage stats
+    // Usage/wash stats
     const usageCount = item.usageHistory.length;
     const lastUse = usageCount > 0 ? item.usageHistory[usageCount - 1] : 'Never';
 
-    // 3) Wash stats
     const washCount = item.washHistory.length;
     const lastWash = washCount > 0 ? item.washHistory[washCount - 1] : 'Never';
 
-    // 4) Temporary wear (with multi-level stains)
+    // Temporary wear with advanced dryness/pilling/fade
     const tempWear = item.wearAndTear || {
       wrinkles: false,
       odors: false,
       stains: { level: 0 },
       elasticityLoss: false,
       surfaceDirt: { level: 0 },
+      dryness: { level: 0 },
+      pilling: { level: 0 },
+      colorFade: { level: 0 },
     };
 
-    // Build a text description for each condition
-    const tempWearDesc = [];
+    const desc = [];
     if (tempWear.wrinkles) {
-      tempWearDesc.push("Wrinkles");
+      desc.push("Wrinkles");
     }
     if (tempWear.odors) {
-      tempWearDesc.push("Odors");
+      desc.push("Odors");
     }
-    // multi-level stains
-    const stainLevel = tempWear.stains?.level || 0;
+    // Stains
+    const stainLevel = tempWear.stains.level || 0;
     if (stainLevel > 0) {
-      tempWearDesc.push(`Stains (L${stainLevel})`);
+      desc.push(`Stains (L${stainLevel})`);
     }
-    if (tempWear.elasticityLoss) {
-      tempWearDesc.push("Elasticity Loss");
+    // dryness
+    const drynessLevel = tempWear.dryness.level || 0;
+    if (drynessLevel > 0) {
+      desc.push(`Dryness (L${drynessLevel})`);
     }
-    const dirtLevel = tempWear.surfaceDirt?.level || 0;
+    // pilling
+    const pillingLevel = tempWear.pilling.level || 0;
+    if (pillingLevel > 0) {
+      desc.push(`Pilling (L${pillingLevel})`);
+    }
+    // colorFade
+    const fadeLevel = tempWear.colorFade.level || 0;
+    if (fadeLevel > 0) {
+      desc.push(`ColorFade (L${fadeLevel})`);
+    }
+    // surfaceDirt
+    const dirtLevel = tempWear.surfaceDirt.level || 0;
     if (dirtLevel > 0) {
-      tempWearDesc.push(`Dirt (L${dirtLevel})`);
+      desc.push(`Dirt (L${dirtLevel})`);
     }
 
-    // 5) Create table row
+    // Build row
     const row = document.createElement('tr');
     row.innerHTML = `
       <td class="image-cell">
@@ -73,20 +83,23 @@ window.updateWardrobeTable = function() {
       <td>${washCount}</td>
       <td>${lastWash}</td>
       <td>${condPercent}%</td>
-      <td>${tempWearDesc.join(", ") || "None"}</td>
+      <td>${desc.join(", ") || "None"}</td>
       <td>
-        <!-- Basic usage/wash buttons -->
+        <!-- Usage/wash buttons -->
         <button class="action-btn usage-btn" onclick="addUsage(${item.id})">Use</button>
         <button class="action-btn wash-btn" onclick="addWash(${item.id})">Wash</button>
         <button class="action-btn history-btn" onclick="viewUsageHistory(${item.id})">Usage Hist</button>
         <button class="action-btn history-btn" onclick="viewWashHistory(${item.id})">Wash Hist</button>
 
-        <!-- Buttons for new multi-level stain approach -->
-        <button onclick="addTemporaryWear(${item.id}, 'stains', { level:1 })">Set Stain L1</button>
-        <button onclick="addTemporaryWear(${item.id}, 'stains', { level:2 })">Set Stain L2</button>
-        <!-- Or increment approach -->
-        <button onclick="incrementStainLevel(${item.id}, 1)">Stain++</button>
+        <!-- TEMP WEAR advanced: dryness/pilling/fade increments -->
+        <button onclick="incrementWearLevel(${item.id}, 'dryness', 1)">Dry++</button>
+        <button onclick="incrementWearLevel(${item.id}, 'pilling', 1)">Pill++</button>
+        <button onclick="incrementWearLevel(${item.id}, 'colorFade', 1)">Fade++</button>
 
+        <!-- Also keep stains or other conditions if you want -->
+        <button onclick="addTemporaryWear(${item.id}, 'stains', { level:2 })">Stain L2</button>
+
+        <!-- Resolve button -->
         <button onclick="resetTemporaryWear(${item.id})">Resolve Wear</button>
         
         <!-- Edit/Delete -->
@@ -98,15 +111,12 @@ window.updateWardrobeTable = function() {
     tbody.appendChild(row);
   });
 
-  // If you have wash or ironing reminders, call them here
-  // e.g. checkReminders();
+  // Optionally call checkReminders() or synergy checks here
 };
 
 /*****************************************************************************
- * SORTING & SEARCH
+ * SORTING & SEARCH 
  *****************************************************************************/
-
-/** Sort by name/washes/usage. */
 document.getElementById('sort-name-btn').addEventListener('click', () => sortItems('name'));
 document.getElementById('sort-wash-btn').addEventListener('click', () => sortItems('washHistory'));
 document.getElementById('sort-usage-btn').addEventListener('click', () => sortItems('usageHistory'));
@@ -123,21 +133,19 @@ function sortItems(field) {
   window.updateWardrobeTable();
 }
 
-/** Filter items by name in real-time. */
 document.getElementById('search-bar').addEventListener('keyup', filterTable);
 function filterTable() {
   const query = document.getElementById('search-bar').value.toLowerCase();
   const rows = document.querySelectorAll('#wardrobe-table tbody tr');
   rows.forEach(row => {
-    const itemName = row.cells[1].textContent.toLowerCase(); // name = col index 1
+    const itemName = row.cells[1].textContent.toLowerCase();
     row.style.display = itemName.includes(query) ? '' : 'none';
   });
 }
 
 /*****************************************************************************
- * EDIT & DELETE
+ * EDITING & DELETING
  *****************************************************************************/
-
 window.editItem = function(id) {
   const item = window.wardrobeItems.find(i => i.id === id);
   if (!item) return;
@@ -153,7 +161,7 @@ window.editItem = function(id) {
   const fabricArea = document.getElementById('fabric-inputs');
   fabricArea.innerHTML = '';
   if (Array.isArray(item.fabrics)) {
-    item.fabrics.forEach(f => {
+    item.fabrics.forEach((f) => {
       const field = document.createElement('div');
       field.className = 'fabric-group';
       field.innerHTML = `
@@ -195,9 +203,8 @@ window.deleteItem = function(id) {
 };
 
 /*****************************************************************************
- * FABRIC ROW MANAGEMENT
+ * ADDING & REMOVING FABRIC ROWS
  *****************************************************************************/
-
 document.getElementById('add-fabric-btn').addEventListener('click', function() {
   const fabricInputs = document.getElementById('fabric-inputs');
   const newField = document.createElement('div');
